@@ -12,15 +12,49 @@ UR::Object::Type->define(
     is => "Command",
     has => [
         nsname => {
-            is_optional => 1,
             shell_args_position => 1,
-            doc => 'the name of the namespace, and first "word" in all classes',
+            doc => 'the name of the namespace, and first "word" in all class names',
         },
     ],
     doc => 'create a new namespace tree and top-level module',
 );
 
 sub sub_command_sort_position { 1 }
+
+sub help_synopsis {
+    return <<'EOS'
+
+$ ur define namespace Acme
+
+$ ur define namespace MyOrg
+
+$ cd /home/someuser/myproject
+$ ur define namespace Foo 
+A   Foo (UR::Namespace)
+A   Foo::Vocabulary (UR::Vocabulary)
+A   Foo::DataSource::Meta (UR::DataSource::Meta)
+A   /home/someuser/myproject/Foo/DataSource/Meta.sqlite3-dump (Metadata DB skeleton)
+
+EOS
+}
+
+sub help_detail {
+    return <<EOS
+Create a new namespace for UR classes.
+
+This command generates a Perl module with the specified name, and a sub-directory for classes in that namespace.
+
+In addition:
+* a vocabulary module is created
+* a data source tree is created
+* a data source for tracking meta-data about the namespace in sqlite is created
+
+This is one of the components which runs automatically from "ur init", but can
+also be run on its own.
+
+See also <ur init -h>
+EOS
+}
 
 our $module_template=<<EOS;
 package %s;

@@ -12,7 +12,7 @@ UR::Object::Type->define(
             shell_args_position => 1,
             doc => 'create this namespace'
         },
-        db => {
+        db_dsn => {
             is => 'Text',
             is_optional => 1,
             shell_args_position => 2,
@@ -33,7 +33,7 @@ sub execute {
 
     chdir $self->namespace or ($self->error_message("error changing to namespace dir? $!") and return);
    
-    $self->status_message(">> ur define datasource " . $self->db);
+    $self->status_message(">> ur define datasource " . $self->db_dsn);
     UR::Namespace::Command::Define::DataSource->execute(dbid => $self->db_dsn) or return;
 
     return 1; 
