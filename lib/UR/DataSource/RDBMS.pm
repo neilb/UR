@@ -17,6 +17,9 @@ UR::Object::Type->define(
         login        => { is => 'String', doc => 'user name to connect as', is_optional => 1 },
         auth         => { is => 'String', doc => 'authentication for the given user', is_optional => 1 },
         owner        => { is => 'String', doc => 'Schema/owner name to connect to', is_optional => 1  },
+        dbi_data_source_name    => { is => 'Text', 
+                                    calculate_from => ['driver','server'],
+                                    calculate => q|dbi:$driver:$server|, },
 
         _all_dbh_hashref                 => { type => 'HASH',       len => undef, is_transient => 1 },
         _default_dbh                     => { type => 'DBI::db',    len => undef, is_transient => 1 },
@@ -25,6 +28,18 @@ UR::Object::Type->define(
     doc => 'A logical DBI-based database, independent of prod/dev/testing considerations or login details.',
 );
 
+sub Xdbi_data_source_name {    
+    my $self = shift->_singleton_object;
+    my $driver  = $self->driver;    
+    my $server  = $self->server;
+    unless ($driver) {
+        Carp::confess("Cannot resolve a dbi_data_source_name with an undefined driver()");
+    }    
+    unless ($server) {
+        Carp::confess("Cannot resolve a dbi_data_source_name with an undefined server()");
+    }
+    return 'dbi:' . $driver . ':' . $server;
+}
 
 sub database_exists {
     my $self = shift;
@@ -388,18 +403,6 @@ sub get_class_meta_for_table_name {
     $self->context_return(@class_meta);
 }
 
-sub dbi_data_source_name {    
-    my $self = shift->_singleton_object;
-    my $driver  = $self->driver;    
-    my $server  = $self->server;
-    unless ($driver) {
-        Carp::confess("Cannot resolve a dbi_data_source_name with an undefined driver()");
-    }    
-    unless ($server) {
-        Carp::confess("Cannot resolve a dbi_data_source_name with an undefined server()");
-    }
-    return 'dbi:' . $driver . ':' . $server;
-}
 
 sub get_default_handle {    
     my $self = shift->_singleton_object;    

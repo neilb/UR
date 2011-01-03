@@ -12,7 +12,7 @@ UR::Object::Type->define(
             shell_args_position => 1,
             doc => 'create this namespace'
         },
-        db => {
+        db_dsn => {
             is => 'Text',
             is_optional => 1,
             shell_args_position => 2,

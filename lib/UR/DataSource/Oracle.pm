@@ -18,7 +18,7 @@ sub owner { uc(shift->_singleton_object->login) }
 sub can_savepoint { 1 }  # Oracle supports savepoints inside transactions
 
 sub set_savepoint {
-my($self,$sp_name) = @_;
+    my($self,$sp_name) = @_;
 
     my $dbh = $self->get_default_dbh;
     my $sp = $dbh->quote($sp_name);
@@ -27,7 +27,7 @@ my($self,$sp_name) = @_;
 
 
 sub rollback_to_savepoint {
-my($self,$sp_name) = @_;
+    my($self,$sp_name) = @_;
 
     my $dbh = $self->get_default_dbh;
     my $sp = $dbh->quote($sp_name);
@@ -102,7 +102,7 @@ sub get_table_last_ddl_times_by_table_name {
 };
 
 sub _get_next_value_from_sequence {
-my($self,$sequence_name) = @_;
+    my ($self,$sequence_name) = @_;
 
     # we may need to change how this db handle is gotten
     my $dbh = $self->get_default_dbh;
@@ -117,7 +117,7 @@ my($self,$sequence_name) = @_;
 }
 
 sub get_bitmap_index_details_from_data_dictionary {
-my($self,$table_name) = @_;
+    my ($self,$table_name) = @_;
     my $sql = qq(
         select c.table_name,c.column_name,c.index_name
         from all_indexes i join all_ind_columns c on i.index_name = c.index_name

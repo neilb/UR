@@ -5,13 +5,13 @@ use UR;
 
 UR::Object::Type->define(
     class_name => __PACKAGE__,
-    is => 'UR::Namespace::Command::RunsOnModulesInTree',
+    #is => 'UR::Namespace::Command::RunsOnModulesInTree',
+    is => 'Command',
     has => [
-        classes_or_modules => {
+        type => {
             is_optional => 0,
-            is_many => 1,
             shell_args_position => 99,
-            doc => 'classes to describe by class name or module path',
+            doc => 'the name of the class to describe'
         },
     ],
     doc => 'show class properties, relationships, meta-data',
@@ -36,9 +36,16 @@ our @CLASS_PROPERTIES_NOT_TO_PRINT = qw(
     all_class_metas
 );
     
-sub for_each_class_object {
+sub execute {
     my $self = shift;
-    my $class_meta = shift;
+    my $class_name = $self->type;
+   
+    eval "require $class_name";
+    my $class_meta = UR::Object::Type->get($class_name);
+    unless ($class_meta) {
+        $self->error_message("No class found for $class_name!  Check the spelling, and if this is a new class be sure you are inside its source tree...");
+        return;
+    }
 
     my $view = UR::Object::Type->create_view(
                     perspective => 'default',
