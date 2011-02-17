@@ -6,7 +6,7 @@ use Cwd;
 
 use UR;
 our $VERSION = "0.29"; # UR $VERSION;
-use Command;
+use Command::V1;
 
 UR::Object::Type->define(
     class_name => __PACKAGE__,
