@@ -18,9 +18,9 @@ my $c = "UR::Namespace::Command::Old::DiffRewrite";
 # can read from, $stderr_twin, but regular perl diagnostic messages still go
 # to the real STDERR
 my $stderr_twin;
-$Command::stderr = undef;
-socketpair($Command::stderr,$stderr_twin, AF_UNIX, SOCK_STREAM, PF_UNSPEC);
-$Command::stderr->autoflush(1);
+$Command::V1::stderr = undef;
+socketpair($Command::V1::stderr,$stderr_twin, AF_UNIX, SOCK_STREAM, PF_UNSPEC);
+$Command::V1::stderr->autoflush(1);
 $stderr_twin->blocking(0);
 
 my $buffer;

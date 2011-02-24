@@ -754,7 +754,7 @@ sub _normalize_class_description {
             }
         }
     }
-    $DB::single = 1 if $class_name eq 'Foo' or $class_name eq 'Command::V1';
+    
     # allow parent classes to adjust the description in systematic ways 
     my $desc = \%new_class;
     unless ($bootstrapping) {
