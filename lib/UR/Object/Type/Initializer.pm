@@ -819,7 +819,7 @@ sub _normalize_class_description {
         my $unknown_ma = delete $pdesc->{unrecognized_meta_attributes};
         next unless $unknown_ma;
         for my $name (keys %$unknown_ma) {
-            if ($meta_properties->{$name}) {
+            if (exists $meta_properties->{$name}) {
                 $pdesc->{$name} = delete $unknown_ma->{$name};
             }
         }
