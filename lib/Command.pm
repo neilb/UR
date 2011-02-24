@@ -27,7 +27,6 @@ sub _resolve_version {
                     $version = '1';
                 }
                 $base_class = $class . '::V' . $version;
-                print "set $base_class for $classdef->{class_name}\n";
                 eval "use $base_class";
                 die $@ if $@;
             }
