@@ -759,15 +759,7 @@ sub _normalize_class_description {
     my $desc = \%new_class;
     unless ($bootstrapping) {
         for my $parent_class_name (@{ $new_class{is} }) {
-            my $parent_class = $parent_class_name->__meta__;
-            $desc = $parent_class->_preprocess_subclass_description($desc);
-        }
-    }
-
-    # cascade extra meta attributes from the parent downward
-    unless ($bootstrapping) {
-        my @additional_property_meta_attributes;
-        for my $parent_class_name (@{ $new_class{is} }) {
+            # ensure the parent classes are fully processed
             no warnings;
             unless ($parent_class_name->can("__meta__")) {
                 __PACKAGE__->use_module_with_namespace_constraints($parent_class_name);
@@ -781,11 +773,20 @@ sub _normalize_class_description {
                 warn "no class metadata bject for $parent_class_name!";
                 next;
             }
+
+            # let the parent class preprocess our description
+            $desc = $parent_class->_preprocess_subclass_description($desc);
+        }
+        
+        # cascade extra meta attributes from the parent downward
+        my @additional_property_meta_attributes;
+        for my $parent_class_name (@{ $new_class{is} }) {
+            my $parent_class = $parent_class_name->__meta__;
             if (my $parent_meta_properties = $parent_class->{attributes_have}) {
                 push @additional_property_meta_attributes, %$parent_meta_properties;
             }
         }
-        #print "inheritance for $class_name has @additional_property_meta_attributes\n";
+
         %$meta_properties = (%$meta_properties, @additional_property_meta_attributes);
 
         # Inheriting from an abstract class that subclasses with a subclassify_by means that
@@ -796,14 +797,17 @@ sub _normalize_class_description {
             my $parent_class_meta = $parent_class_name->__meta__();
             foreach my $ancestor_class_meta ( $parent_class_meta->all_class_metas ) {
                 if (my $subclassify_by = $ancestor_class_meta->subclassify_by) {
-                    $instance_properties->{$subclassify_by} ||= { property_name => $subclassify_by,
-                                                                  default_value => $class_name,
-                                                                  is_constant => 1,
-                                                                  is_class_wide => 1,
-                                                                  is_specified_in_module_header => 0,
-                                                                  column_name => '',
-                                                                  implied_by => $parent_class_meta->class_name . '::subclassify_by',
-                                                                };
+                    my %old_property = ( 
+                        property_name => $subclassify_by,
+                        default_value => $class_name,
+                        is_constant => 1,
+                        is_class_wide => 1,
+                        is_specified_in_module_header => 0,
+                        column_name => '',
+                        implied_by => $parent_class_meta->class_name . '::subclassify_by',
+                    );
+                    my %new_property = $class->_normalize_property_description($subclassify_by, \%old_property, \%new_class);
+                    $instance_properties->{$subclassify_by} = \%new_property;
                     last PARENT_CLASS;
                 }
             }
